@@ -119,14 +119,27 @@ const TasteTropicsQuiz = () => {
   };
 
   const calculatePersonality = () => {
+    // Handle empty answers case
+    if (answers.length === 0) {
+      return personalities.balanced;
+    }
+
     const traitCounts = {};
     answers.forEach(answer => {
       traitCounts[answer.trait] = (traitCounts[answer.trait] || 0) + 1;
     });
     
-    const dominantTrait = Object.keys(traitCounts).reduce((a, b) => 
-      traitCounts[a] > traitCounts[b] ? a : b
+    // Find the maximum count
+    const maxCount = Math.max(...Object.values(traitCounts));
+    
+    // Get all traits with the maximum count
+    const dominantTraits = Object.keys(traitCounts).filter(
+      trait => traitCounts[trait] === maxCount
     );
+    
+    // In case of ties, prioritize in order: balanced, fresh, bold, mystical, adventurous
+    const priorityOrder = ['balanced', 'fresh', 'bold', 'mystical', 'adventurous'];
+    const dominantTrait = priorityOrder.find(trait => dominantTraits.includes(trait)) || dominantTraits[0];
     
     return personalities[dominantTrait] || personalities.balanced;
   };
